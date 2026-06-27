@@ -50,3 +50,54 @@ button:hover {
     flex: 1;
     height: 100%;
 }
+/* パネル開閉 */
+
+#panel{
+
+    transition:0.3s;
+
+}
+
+#panel.hide{
+
+    margin-left:-330px;
+
+}
+
+#toggle{
+
+    position:absolute;
+
+    top:15px;
+
+    left:330px;
+
+    width:35px;
+
+    height:60px;
+
+    background:#1976d2;
+
+    color:white;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    cursor:pointer;
+
+    border-radius:0 8px 8px 0;
+
+    z-index:2000;
+
+    user-select:none;
+
+}
+
+#panel.hide + #toggle{
+
+    left:0;
+
+}
