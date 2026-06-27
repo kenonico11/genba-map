@@ -1,49 +1,30 @@
+// 地図を作成
 const map = L.map("map").setView([35.4437, 139.6380], 10);
 
+// OpenStreetMapを表示
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     attribution: "© OpenStreetMap contributors"
 }).addTo(map);
 
-document.getElementById("addBtn").addEventListener("click", async () => {
+// 「現場追加」ボタン
+document.getElementById("addBtn").addEventListener("click", () => {
 
     const customer = document.getElementById("customer").value;
-    const address = document.getElementById("address").value;
     const work = document.getElementById("work").value;
     const time = document.getElementById("time").value;
 
-    if(address===""){
-        alert("住所を入力してください");
-        return;
-    }
+    // 仮の位置（横浜駅）
+    const lat = 35.4660;
+    const lon = 139.6227;
 
-    const url =
-`https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=${encodeURIComponent(address)}`;
-
-    const res = await fetch(url,{
-        headers:{
-            "Accept":"application/json"
-        }
-    });
-
-    const data = await res.json();
-
-    if(data.length===0){
-        alert("住所が見つかりません");
-        return;
-    }
-
-    const lat = Number(data[0].lat);
-    const lon = Number(data[0].lon);
-
-    map.setView([lat,lon],16);
-
-    const marker=L.marker([lat,lon]).addTo(map);
+    const marker = L.marker([lat, lon]).addTo(map);
 
     marker.bindPopup(`
         <b>${customer}</b><br>
-        ${work}<br>
-        ${time}分<br>
-        ${address}
+        作業：${work}<br>
+        時間：${time}分
     `);
+
+    map.setView([lat, lon], 15);
 
 });
