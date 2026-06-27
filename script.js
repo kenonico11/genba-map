@@ -1,5 +1,6 @@
 // 地図を作成
 const map = L.map("map").setView([35.4437, 139.6380], 10);
+let genbaList = [];
 
 // OpenStreetMap
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -40,6 +41,19 @@ document.getElementById("addBtn").addEventListener("click", async () => {
         const marker = L.marker([lat, lon]).addTo(map);
 
         marker.bindPopup(`
+        genbaList.push({
+    customer,
+    address,
+    work,
+    time,
+    lat,
+    lon
+});
+
+localStorage.setItem(
+    "genbaList",
+    JSON.stringify(genbaList)
+);
             <b>${customer}</b><br>
             ${work}<br>
             ${time}分<br>
