@@ -17,7 +17,7 @@ document.getElementById("addBtn").addEventListener("click", async () => {
     }
 
     const url =
-    `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`;
+`https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=${encodeURIComponent(address)}`;
 
     const res = await fetch(url,{
         headers:{
