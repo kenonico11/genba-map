@@ -165,3 +165,26 @@ window.deleteGenba = function(index){
     renderList();
 
 }
+
+const toggle = document.getElementById("toggle");
+const panel = document.getElementById("panel");
+
+toggle.onclick = () => {
+
+    panel.classList.toggle("hide");
+
+    if(panel.classList.contains("hide")){
+
+        toggle.innerHTML="▶";
+
+    }else{
+
+        toggle.innerHTML="◀";
+
+    }
+
+    setTimeout(()=>{
+        map.invalidateSize();
+    },300);
+
+}
