@@ -1,26 +1,28 @@
-// =========================
-// 現場マップ Ver1.0
-// =========================
+// ===============================
+// 現場マップ Ver1.1
+// 地図・保存・一覧・削除
+// ===============================
 
-// 地図作成
 const map = L.map("map").setView([35.4437, 139.6380], 10);
 
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     attribution: "© OpenStreetMap contributors"
 }).addTo(map);
 
-// 保存用配列
 let genbaList = [];
+let markers = [];
 
-// 保存済みデータを読み込む
+// 保存データ読込
 const saved = localStorage.getItem("genbaList");
 
 if (saved) {
-
     genbaList = JSON.parse(saved);
 
-    genbaList.forEach(addMarker);
+    genbaList.forEach(genba => {
+        addMarker(genba);
+    });
 
+    renderList();
 }
 
 // 現場追加
@@ -31,12 +33,9 @@ document.getElementById("addBtn").addEventListener("click", async () => {
     const work = document.getElementById("work").value;
     const time = document.getElementById("time").value;
 
-    if (address === "") {
-
+    if (!address) {
         alert("住所を入力してください");
-
         return;
-
     }
 
     try {
@@ -46,15 +45,11 @@ document.getElementById("addBtn").addEventListener("click", async () => {
             encodeURIComponent(address);
 
         const res = await fetch(url);
-
         const data = await res.json();
 
         if (data.length === 0) {
-
             alert("住所が見つかりません");
-
             return;
-
         }
 
         const genba = {
@@ -70,14 +65,13 @@ document.getElementById("addBtn").addEventListener("click", async () => {
 
         genbaList.push(genba);
 
-        localStorage.setItem(
-            "genbaList",
-            JSON.stringify(genbaList)
-        );
+        saveData();
 
         addMarker(genba);
 
-        map.setView([genba.lat, genba.lon], 16);
+        renderList();
+
+        map.setView([genba.lat, genba.lon], 15);
 
         document.getElementById("customer").value = "";
         document.getElementById("address").value = "";
@@ -85,7 +79,7 @@ document.getElementById("addBtn").addEventListener("click", async () => {
 
     } catch (e) {
 
-        console.error(e);
+        console.log(e);
 
         alert("住所検索に失敗しました");
 
@@ -93,16 +87,81 @@ document.getElementById("addBtn").addEventListener("click", async () => {
 
 });
 
-// マーカー追加
+function saveData() {
+
+    localStorage.setItem(
+        "genbaList",
+        JSON.stringify(genbaList)
+    );
+
+}
+
 function addMarker(genba) {
 
     const marker = L.marker([genba.lat, genba.lon]).addTo(map);
 
     marker.bindPopup(`
-        <b>${genba.customer}</b><br>
+        <b>${genba.customer || "お客様名なし"}</b><br>
         ${genba.work}<br>
         ${genba.time}分<br>
         ${genba.address}
     `);
+
+    markers.push(marker);
+
+}
+
+function renderList() {
+
+    const list = document.getElementById("list");
+
+    list.innerHTML = "";
+
+    genbaList.forEach((genba, index) => {
+
+        const div = document.createElement("div");
+
+        div.style.border = "1px solid #ccc";
+        div.style.padding = "8px";
+        div.style.marginBottom = "8px";
+        div.style.borderRadius = "6px";
+
+        div.innerHTML = `
+            <b>${genba.customer || "お客様名なし"}</b><br>
+            ${genba.work}<br>
+            ${genba.time}分<br>
+            <button onclick="moveToGenba(${index})">地図へ</button>
+            <button onclick="deleteGenba(${index})">削除</button>
+        `;
+
+        list.appendChild(div);
+
+    });
+
+}
+
+window.moveToGenba = function(index){
+
+    const g = genbaList[index];
+
+    map.setView([g.lat, g.lon],16);
+
+    markers[index].openPopup();
+
+}
+
+window.deleteGenba = function(index){
+
+    if(!confirm("削除しますか？")) return;
+
+    map.removeLayer(markers[index]);
+
+    markers.splice(index,1);
+
+    genbaList.splice(index,1);
+
+    saveData();
+
+    renderList();
 
 }
